@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="utf-8">
+<head>
+     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Title</title>
+    <link rel="stylesheet" href="/static/css/common.css"/>
+</head>
+<body>
+    <div class="pg-header">
+        <div class="header-menu">
+            <a href="/" class="digg-logo"></a>
+            <a class="tb active" href="/index/">全部</a>
+            <a class="tb" href="/index/">科技</a>
+            <a class="tb"   href="/index/">政治</a>
+            <a class="tb"  href="/index/">搞笑</a>
+        </div>
+        <div></div>
+    </div>
+    <div class="page-body" style="height:300px">
+        {% for item in data %}
+        <div style="margin-top:10px;margin-left: 10px;font-size:25px"><a href="{{ item.url }}">{{ item.title }}</a> </div>
+        <div style="margin-top:3px;margin-left: 10px;font-size:15px">{{ item.overview }}</div>
+            <div style="margin-top:3px;margin-left: 10px;font-size:10px">
+                  {% csrf_token %}
+                <a href="#" onclick="Favor(this,{{ item.id }})">赞{{ item.favor_count }}</a>
+
+                <a href="#" onclick="Reply(this,{{ item.id }})">评论{{ item.comment_count }}</a>
+                <span>{{ item.createtime|date:"Y-m-d H:i:s" }}</span>
+
+            </div>
+
+        {% endfor %}
+    </div>
+    <div style="height:200px;position:absolute;bottom:0">
+        <div>一共{{ count }}条记录</div>
+    <a href="/index/1/">首页</a>
+    <!--{{ page_idx }}-->
+    {{ all_html }}
+    <a href="/index/{{ totalpage }}/">尾页</a>
+    <div>每页显示
+    <select id='refresh' onchange="ChangePage(this);">
+        <option value="10">10</option>
+        <option value="20">20</option>
+        <option value="30">30</option>
+    </select>
+    </div>
+<hr/>
+        <div>
+            <form action="/validate/" method="POST">
+                {% csrf_token%}
+                <div>{{ code }}</div>
+                <input type="text" name="check_code" placeholder="请输入验证码"/>
+                <input type="button"  value="刷新" />
+                <input type="submit" value="提交"/>
+            </form>
+        </div>
+    <script src="/static/js/jquery-3.2.1.js"></script>
+    <script src="/static/js/jquery.cookie.js"></script>
+    <script type="text/javascript">
+
+        $(function(){
+            var per_item=$.cookie("page_num");
+            if(per_item){
+                $('#refresh').val(per_item);
+            }
+
+        })
+        function ChangePage(arg){
+            //var id=document.getElementById('refresh')
+            //console.log(id.value())
+            //console.log()
+            var value=$(arg).val();
+            console.log(value)
+            $.cookie("page_num",value,{path:'/'});
+
+        }
+        
+        function Favor(doc,id) {
+            $.ajax({
+
+                url:'/addfavor/',
+                data:{nid:id},
+                type:'POST',
+                success:function (callback) {
+                    var temp='赞'+callback;
+                         $(doc).text(temp);
+                }
+            });
+
+        }
+
+        function Validate(code) {
+
+        }
+    </script>
+
+</body>
+</html>
